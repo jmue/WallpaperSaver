@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Wallpaper Saver</string>
+    <string name="title_activity_main">Wallpaper Saver</string>
+    <string name="save">Save</string>
+    <string name="ok">OK</string>
+
+    <string name="external_storage_access_required">you need external storage access to copy wallpaper</string>
+    <string name="wallpaper_preview">Wallpaper preview</string>
+
+</resources>
