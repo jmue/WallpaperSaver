@@ -18,7 +18,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.FileOutputStream
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
@@ -43,11 +42,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int,
                                          resultData: Intent?) {
-
         if (requestCode == WRITE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            if (resultData != null) {
-                SaveWallpaperTask(resultData.data).execute()
-            }
+            resultData?.data?.also { uri -> SaveWallpaperTask(uri).execute() }
         }
     }
 
@@ -65,9 +61,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openFileChooser() {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-        intent.type = "image/png"
-        intent.putExtra(Intent.EXTRA_TITLE, "wallpaper")
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            type = "image/png"
+            addCategory(Intent.CATEGORY_OPENABLE)
+            putExtra(Intent.EXTRA_TITLE, "wallpaper")
+        }
         startActivityForResult(intent, WRITE_REQUEST_CODE)
     }
 
@@ -106,13 +104,10 @@ class MainActivity : AppCompatActivity() {
 
         override fun doInBackground(vararg voids: Void): Void? {
             try {
-                val context = this@MainActivity
-                val pfd = context.contentResolver.openFileDescriptor(uri, "w")
-                val fileOutputStream = FileOutputStream(pfd!!.fileDescriptor)
-
-                val wallpaper = drawableToBitmap(WallpaperManager.getInstance(context).drawable)
-                wallpaper.compress(Bitmap.CompressFormat.PNG, 0, fileOutputStream)
-
+                contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    val wallpaper = drawableToBitmap(WallpaperManager.getInstance(this@MainActivity).drawable)
+                    wallpaper.compress(Bitmap.CompressFormat.PNG, 0, outputStream)
+                }
             } catch (ignored: IOException) {
             }
 
