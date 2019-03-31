@@ -30,7 +30,14 @@ class MainActivity : AppCompatActivity() {
 
         mLayout = findViewById(R.id.main_layout)
 
-        save_button.setOnClickListener({ openFileChooser() })
+        save_button.setOnClickListener {
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                type = "image/png"
+                addCategory(Intent.CATEGORY_OPENABLE)
+                putExtra(Intent.EXTRA_TITLE, "wallpaper")
+            }
+            startActivityForResult(intent, WRITE_REQUEST_CODE)
+        }
 
         showWallpaperPreview()
     }
@@ -58,15 +65,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateWallpaperPreview() {
         wallpaper_image.setImageDrawable(WallpaperManager.getInstance(this).drawable)
-    }
-
-    private fun openFileChooser() {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            type = "image/png"
-            addCategory(Intent.CATEGORY_OPENABLE)
-            putExtra(Intent.EXTRA_TITLE, "wallpaper")
-        }
-        startActivityForResult(intent, WRITE_REQUEST_CODE)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
